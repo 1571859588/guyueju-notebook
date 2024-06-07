@@ -1,4 +1,4 @@
-# MNIST实战2
+# MNIST实战1
 
 ## 模板及本节代码地址
 
@@ -10,13 +10,11 @@ github: [1571859588/PyTorch_Template: PyTorch Template is used to finish the mod
 
 ## 前言
 
-上一节的模型构造单纯使用的是全连接层进行的实验，虽然效果也是很不错的，但是对于图像问题，我们通常使用卷积来进行计算。这一节我们会采用卷积来完成手写字识别这个项目。
+MNIST数据集是一个广泛使用的手写数字数据集，它包含了60,000个训练样本和10,000个测试样本。每个样本是一个28x28像素的灰度图像，代表一个手写数字，从0到9。MNIST数据集是机器学习和计算机视觉领域中用于测试和训练模型的经典数据集之一。
 
-在最后我们顺便比较一下卷积和全连接层来进行CV作业的时候的效果。
+![image-20240604111921665](【2】MNIST实战2.assets/image-20240604111921665.png)
 
-> 至于为什么使用全连接层也可以达到不错的效果，实际上我认为卷积核跟全连接层原理大差不差，都是可以训练的，都是一个个神经元，只是卷积核能够罩住一个区域，而全连接层只能使用连续的一维区域进行训练罢了——这一个部分《小白也能听懂的人工智能原理》讲的很清楚
-
-本节我会对一些常用但是容易迷惑的地方进行讲解，也会经常提到数据的格式是怎么一步步计算得到的（因为数据格式在构建模型中很重要！），如果已经会了的话可以自行跳过。
+本节我们使用的数据集是MNIST网络资源，所以不需要自己进行数据预处理，即不需要写`00data_preprocess_template.py`这个文件。
 
 
 
@@ -63,9 +61,9 @@ test_dataset = datasets.MNIST('./data', train=False, transform=transform)
 
 这两行代码会自动联网下载MNIST数据集，并将数据集保存到指定的`./data`目录下，如下图
 
-![image-20240602193656288](【2】MNIST实战2.assets/image-20240602193656288.png)
+![image-20240602193656288](【2】MNIST实战2.assets/image-20240602193656288-171773151028048.png)
 
-![image-20240602194652581](【2】MNIST实战2.assets/image-20240602194652581.png)
+![image-20240602194652581](【2】MNIST实战2.assets/image-20240602194652581-171773151028049.png)
 
 
 
@@ -88,7 +86,7 @@ print("transformed_img shape",transformed_img.shape)
 
 我们运行代码，运行结果如下图所示：
 
-![image-20240602195840892](【2】MNIST实战2.assets/image-20240602195840892.png)
+![image-20240602195840892](【2】MNIST实战2.assets/image-20240602195840892-171773151028050.png)
 
 即MNIST的图片是PIL格式
 
@@ -159,13 +157,13 @@ MNIST数据集只需要最简单的全连接层即可完成较高准确率的分
 
 由于MNIST数据集的训练集和测试集数据都是1x28x28的数据，所以我们将其展开成一维数组，即`x=x.view(x.size(0),-1)`，-1表示-1所在的维度自动调整，调整规则是相除规则，我们可以打印一下forward的x参数的数据格式：
 
-![image-20240602203229408](【2】MNIST实战2.assets/image-20240602203229408.png)
+![image-20240602203229408](【2】MNIST实战2.assets/image-20240602203229408-171773151028051.png)
 
 即x是batch_sizex1x28x28的张量，所以这里`forward`函数的x输入参数的`batch_size`默认都是第1维度的，即下标0。所以这里的x执行完成后变成`batch_sizex784`的张量
 
 这样input_size就为784，hidden_size随机，output_size为10，因为我们的任务就是识别出0-9的数字，这样第22行返回的x实际上就是`batch_sizex10`的张量
 
-![image-20240602202601266](【2】MNIST实战2.assets/image-20240602202601266.png)
+![image-20240602202601266](【2】MNIST实战2.assets/image-20240602202601266-171773151028053.png)
 
 在训练过程中返回的x就是`64x10`的张量。
 
@@ -267,11 +265,11 @@ print(loss)  # 输出损失值
 
 在实际应用中，交叉熵损失通常与softmax激活函数结合使用，以确保模型输出为概率分布。在PyTorch中，可以通过`nn.CrossEntropyLoss`自动应用`log_softmax`，因此不需要手动计算对数概率。
 
-![image-20240604114100484](【2】MNIST实战2.assets/image-20240604114100484.png)
+![image-20240604114100484](【2】MNIST实战2.assets/image-20240604114100484-171773151028052.png)
 
 手动计算：
 
-![image-20240604120050147](【2】MNIST实战2.assets/image-20240604120050147.png)
+![image-20240604120050147](【2】MNIST实战2.assets/image-20240604120050147-171773151028054.png)
 
 
 
@@ -448,7 +446,7 @@ def main():
 
 - csv_paths：这里不太需要改，但是这里为了有多个图像的对比，我在`01preprocessed_data`里创建了2个没有意义的csv文件，在这里仅仅用作多次循环以求取最好的网络结构和最高准确率
 
-![image-20240602204517546](【2】MNIST实战2.assets/image-20240602204517546.png)
+![image-20240602204517546](【2】MNIST实战2.assets/image-20240602204517546-171773151028055.png)
 
 - original_lr：表示刚开始的学习率，一定要指定
 
@@ -753,41 +751,27 @@ if __name__=='__main__':
 
 ## 运行结果
 
-![image-20240602211623261](【2】MNIST实战2.assets/image-20240602211623261.png)
+![image-20240602211623261](【2】MNIST实战2.assets/image-20240602211623261-171773151028056.png)
 
 ### best_model
 
-![image-20240602212213889](【2】MNIST实战2.assets/image-20240602212213889.png)
+![image-20240602212213889](【2】MNIST实战2.assets/image-20240602212213889-171773151028057.png)
 
-文件名即为准确率
 
-如果要提取网络结构和参数只需调用下面封装好的函数即可：
 
-```python
-# filepath为pth路径，model是需要导入的模型
-def load_checkpoint(filepath, model, optimizer, device):
-    if not os.path.exists(filepath):
-        print("该模型不存在")
-    checkpoint = torch.load(filepath, map_location=device)
-    model.load_state_dict(checkpoint['model_state_dict'])
-    optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
-    epoch = checkpoint['epoch']
-    print(f"Model loaded from {filepath}, epoch {epoch}")
-    print("hidden_size=",checkpoint['hidden_size'])
-    return model, optimizer, epoch,checkpoint['hidden_size']
-```
+可以看到，纯用全连接层的模型准确率比上一节卷积模型的最高准确率`0.9908` 更低，说明卷积对于图像的数据集更有效。
 
 ### figure
 
-![image-20240602212611000](【2】MNIST实战2.assets/image-20240602212611000.png)
+![image-20240602212611000](【2】MNIST实战2.assets/image-20240602212611000-171773151028058.png)
 
-![image-20240602212639072](【2】MNIST实战2.assets/image-20240602212639072.png)
+![image-20240602212639072](【2】MNIST实战2.assets/image-20240602212639072-171773151028059.png)
 
-![image-20240602212659086](【2】MNIST实战2.assets/image-20240602212659086.png)
+![image-20240602212659086](【2】MNIST实战2.assets/image-20240602212659086-171773151028062.png)
 
-![image-20240602212708069](【2】MNIST实战2.assets/image-20240602212708069.png)
+![image-20240602212708069](【2】MNIST实战2.assets/image-20240602212708069-171773151028060.png)
 
-![image-20240602212712866](【2】MNIST实战2.assets/image-20240602212712866.png)
+![image-20240602212712866](【2】MNIST实战2.assets/image-20240602212712866-171773151028061.png)
 
 文件名都是一一对应的
 
